@@ -1,0 +1,126 @@
+"""
+Kostas Spyropoulos
+Password Decoder With Recursion
+8/19/2022
+"""
+import string 
+import random
+
+passwordEntered = str(input('Enter password to be decoded: '))
+
+# passwordTemplate is double the passwordEntered's length to make sufficient room to crack password in an array
+passwordTemplate = int(len(passwordEntered)*3/2)
+
+# list of characters
+charList = []
+
+# password soon to be the correct password
+charListRealPassword = [None,None,None,None]
+
+# fill in charListRealPassword with None to prevent any matching with a printable character
+for char in range(passwordTemplate):
+    charListRealPassword.append(None)
+
+# list representing the passwordEntered
+passwordEnteredList = []
+
+# list containing the amount of incorrect guesses
+charErrorList = []
+
+# makes sure correct password is being guessed 
+charListEnforcer = []
+
+# makes sure correct password is being guessed as well
+charListEnforcerTwo = []
+
+# fill in charList with all printable characters
+for character in list(string.printable):
+    charList.append(character)
+
+#iterate through all characters of passwordEntered
+for character in passwordEntered:
+    # if character is not a string,
+    # append character as a string to the following lists.
+    # Otherwise, append character to the same following lists. 
+    if isinstance(character, str) == False:
+        passwordEnteredList.append(str(character))
+        charListEnforcer.append(str(character))
+        charListEnforcerTwo.append(str(character))
+    else:
+        passwordEnteredList.append(character)
+        charListEnforcer.append(character)
+        charListEnforcerTwo.append(str(character))
+
+
+# decoder function decodes the password
+def decoder(passwordEnteredList, charList, charListRealPassword, charListEnforcer,charListEnforcerTwo):
+    # length of actual password
+    length = len(passwordEnteredList)
+    
+    # random character guess from all possible printables
+    char = random.choice(charList)
+    
+    # if the actual password length is greater than 0, guess the character of the password
+    if length != 0:
+        
+        # if char is a correct guess
+        if char in passwordEnteredList[0]:
+            
+            # if char exists in charListEnforcerTwo more than once
+            if charListEnforcerTwo.count(char) > 1 :
+                
+                # passwordEnteredList is filled without the char being present
+                passwordEnteredList[:] = [item for item in passwordEnteredList if item != char]
+                
+                # array of indices
+                indices = []
+                
+                # iterate through charListEnforcer
+                for n in range(len(charListEnforcer)): 
+                    # if element is equal to char, append the index of element to indices list
+                    if charListEnforcer[n] == char:
+                        indices.append(n)
+                        
+                # iterate through indices
+                for n in range(len(indices)):
+                    # delete at the charListRealPassword's index representing index of charLListEnforcer's element equaling char
+                    del charListRealPassword[indices[n]]
+                    
+                    # insert at the charListRealPassword's index representing index of charLListEnforcer's element equaling char
+                    charListRealPassword.insert(indices[n],char)
+               
+            # if char exists in charListEnforcerTwo only once
+            if charListEnforcerTwo.count(char) == 1:
+                
+                # delete the character at passwordEnteredList[0], to move closer to base case
+                del passwordEnteredList[0]
+                
+                # delete the last element of charListRealPassword which is a None
+                del charListRealPassword[len(charListEnforcer)-1]
+                
+                # delete the index of the charListEnforcer where the char located
+                del charListRealPassword[charListEnforcer.index(char)]
+                
+                # insert the char at charListRealPassword  from where the index of char of charListEnforcer 
+                charListRealPassword.insert(charListEnforcer.index(char),char)  
+            
+            # recurse
+            decoder(passwordEnteredList, charList, charListRealPassword, charListEnforcer, charListEnforcerTwo)
+        
+        # if char is an incorrect guess for the passwordEnteredList[0], recurse
+        elif char not in passwordEnteredList[0]:
+            decoder(passwordEnteredList, charList, charListRealPassword, charListEnforcer, charListEnforcerTwo)
+    
+    # base case is fulfilled, when length of passwordEnteredList is 0
+    elif length == 0:
+       
+        # iterate though charListRealPassword to get rid of an None values
+        displayPasswordArray = [i for i in charListRealPassword if i is not None]
+
+        # put displayPasswordArray into a string
+        displayPassword = ''.join(str(v) for v in displayPasswordArray)
+        
+        print("Decoded password: " + str(displayPassword))
+
+# call decoder function
+decoder(passwordEnteredList, charList, charListRealPassword, charListEnforcer, charListEnforcerTwo)
