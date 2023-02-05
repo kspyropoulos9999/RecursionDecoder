@@ -8,7 +8,7 @@ import random
 
 passwordEntered = str(input('Enter password to be decoded: '))
 
-# passwordTemplate is double the passwordEntered's length to make sufficient room to crack password in an array
+# passwordTemplate is 3/2 the passwordEntered's length to make sufficient room to crack password in an array
 passwordTemplate = int(len(passwordEntered)*3/2)
 
 # list of characters
